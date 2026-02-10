@@ -92,7 +92,7 @@ namespace UIKit {
 		/// <summary>Scales the image up or down.</summary>
 		/// <param name="newSize">The desired size for the scaled image.</param>
 		/// <param name="scaleFactor">Scale factor to apply to the scaled image. If the value specified is zero, the device's scale factor is used.</param>
-		/// <returns>The scaled image.</returns>
+		/// <returns>The scaled image, or <see langword="null" /> in case of failure.</returns>
 		/// <remarks>
 		///   <para tool="threads">This can be used from a background thread.</para>
 		/// </remarks>
@@ -102,7 +102,7 @@ namespace UIKit {
 		[UnsupportedOSPlatform ("ios17.0")]
 		[UnsupportedOSPlatform ("tvos17.0")]
 		[UnsupportedOSPlatform ("maccatalyst17.0")]
-		public UIImage Scale (CGSize newSize, nfloat scaleFactor)
+		public UIImage? Scale (CGSize newSize, nfloat scaleFactor)
 		{
 			UIGraphics.BeginImageContextWithOptions (newSize, false, scaleFactor);
 
@@ -116,7 +116,7 @@ namespace UIKit {
 
 		/// <summary>Scales the image up or down.</summary>
 		/// <param name="newSize">The desired size for the scaled image.</param>
-		/// <returns>The scaled image.</returns>
+		/// <returns>The scaled image, or <see langword="null" /> in case of failure.</returns>
 		/// <remarks>
 		///   <para tool="threads">This can be used from a background thread.</para>
 		/// </remarks>
@@ -126,7 +126,7 @@ namespace UIKit {
 		[UnsupportedOSPlatform ("ios17.0")]
 		[UnsupportedOSPlatform ("tvos17.0")]
 		[UnsupportedOSPlatform ("maccatalyst17.0")]
-		public UIImage Scale (CGSize newSize)
+		public UIImage? Scale (CGSize newSize)
 		{
 			UIGraphics.BeginImageContext (newSize);
 
