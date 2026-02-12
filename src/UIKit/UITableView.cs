@@ -31,7 +31,7 @@ namespace UIKit {
 		/// </remarks>
 		public void RegisterClassForCellReuse (Type? cellType, NSString reuseIdentifier)
 		{
-			RegisterClassForCellReuse (cellType is null ? IntPtr.Zero : Class.GetHandle (cellType), reuseIdentifier);
+			RegisterClassForCellReuse (Class.GetHandle (cellType), reuseIdentifier);
 		}
 
 		/// <summary>Registers the <paramref name="cellType" /> type for reuse, keyed by the identifier <paramref name="reuseIdentifier" />.</summary>
@@ -40,7 +40,7 @@ namespace UIKit {
 		public void RegisterClassForCellReuse (Type? cellType, string reuseIdentifier)
 		{
 			using (var str = (NSString) reuseIdentifier)
-				RegisterClassForCellReuse (cellType is null ? IntPtr.Zero : Class.GetHandle (cellType), str);
+				RegisterClassForCellReuse (Class.GetHandle (cellType), str);
 		}
 
 		/// <summary>Registers the <paramref name="cellType" /> type for header or footer view reuse, keyed by the identifier <paramref name="reuseIdentifier" />.</summary>
@@ -49,7 +49,7 @@ namespace UIKit {
 		public void RegisterClassForHeaderFooterViewReuse (Type? cellType, string reuseIdentifier)
 		{
 			using (var str = (NSString) reuseIdentifier)
-				RegisterClassForHeaderFooterViewReuse (cellType is null ? IntPtr.Zero : Class.GetHandle (cellType), str);
+				RegisterClassForHeaderFooterViewReuse (Class.GetHandle (cellType), str);
 		}
 
 		/// <summary>Registers a type to provide <see cref="UITableViewHeaderFooterView" /> instances for headers or footers for a specific reuse identifier.</summary>
@@ -65,7 +65,7 @@ namespace UIKit {
 		/// </remarks>
 		public void RegisterClassForHeaderFooterViewReuse (Type? cellType, NSString reuseIdentifier)
 		{
-			RegisterClassForHeaderFooterViewReuse (cellType is null ? IntPtr.Zero : Class.GetHandle (cellType), reuseIdentifier);
+			RegisterClassForHeaderFooterViewReuse (Class.GetHandle (cellType), reuseIdentifier);
 		}
 
 		// This is not obsolete, we provide both a (UINib,string) overload and a (UINib,NSString) overload.
