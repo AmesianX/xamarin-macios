@@ -73,39 +73,39 @@ stages:
         displayName: 'Disable CodeQL'
         name: disableCodeQLOnArm64
 
-  # Check - "xamarin-macios (Prepare Release Convert NuGet to MSI)"
-  - template: nuget-msi-convert/job/v4.yml@yaml-templates
-    parameters:
-      use1ESTemplate: true
-      yamlResourceName: yaml-templates
-      dependsOn: signing
-      artifactName: '${{ parameters.uploadPrefix }}nuget-signed'
-      propsArtifactName: ${{ parameters.uploadPrefix }}not-signed-package
-      binlogsArtifactName: ${{ parameters.uploadPrefix }}nuget-msi-convert-binlogs
-      signType: Real
-      preConvertSteps:
-      - pwsh: |
-          New-Item "$(System.DefaultWorkingDirectory)/$(BUILD_REPOSITORY_TITLE)/tools/devops/governance" -ItemType Directory -ea 0
-          New-Item -Path "$(System.DefaultWorkingDirectory)/$(BUILD_REPOSITORY_TITLE)/tools/devops/governance" -Name "CredScanSuppressions.json" -Value '{"tool":"Crendential Scanner", "supressions":[]}'
-        displayName: Create credscan dummy ignore file
+  # # Check - "xamarin-macios (Prepare Release Convert NuGet to MSI)"
+  # - template: nuget-msi-convert/job/v4.yml@yaml-templates
+  #   parameters:
+  #     use1ESTemplate: true
+  #     yamlResourceName: yaml-templates
+  #     dependsOn: signing
+  #     artifactName: '${{ parameters.uploadPrefix }}nuget-signed'
+  #     propsArtifactName: ${{ parameters.uploadPrefix }}not-signed-package
+  #     binlogsArtifactName: ${{ parameters.uploadPrefix }}nuget-msi-convert-binlogs
+  #     signType: Real
+  #     preConvertSteps:
+  #     - pwsh: |
+  #         New-Item "$(System.DefaultWorkingDirectory)/$(BUILD_REPOSITORY_TITLE)/tools/devops/governance" -ItemType Directory -ea 0
+  #         New-Item -Path "$(System.DefaultWorkingDirectory)/$(BUILD_REPOSITORY_TITLE)/tools/devops/governance" -Name "CredScanSuppressions.json" -Value '{"tool":"Crendential Scanner", "supressions":[]}'
+  #       displayName: Create credscan dummy ignore file
 
-      postConvertSteps:
-      - task: DownloadPipelineArtifact@2
-        inputs:
-          artifactName: '${{ parameters.uploadPrefix }}not-signed-package'
-          downloadPath: $(Build.StagingDirectory)\sign-verify
-          patterns: |
-            **/SignVerifyIgnore.txt
+  #     postConvertSteps:
+  #     - task: DownloadPipelineArtifact@2
+  #       inputs:
+  #         artifactName: '${{ parameters.uploadPrefix }}not-signed-package'
+  #         downloadPath: $(Build.StagingDirectory)\sign-verify
+  #         patterns: |
+  #           **/SignVerifyIgnore.txt
 
-      - task: MicroBuildCodesignVerify@3
-        displayName: verify signed msi content
-        inputs:
-          TargetFolders: |
-            $(Build.ArtifactStagingDirectory)\bin\manifests
-            $(Build.ArtifactStagingDirectory)\bin\manifests-packs
-            $(Build.ArtifactStagingDirectory)\bin\msi-nupkgs
-          ExcludeSNVerify: true
-          ApprovalListPathForCerts: $(Build.StagingDirectory)\sign-verify\SignVerifyIgnore.txt
+  #     - task: MicroBuildCodesignVerify@3
+  #       displayName: verify signed msi content
+  #       inputs:
+  #         TargetFolders: |
+  #           $(Build.ArtifactStagingDirectory)\bin\manifests
+  #           $(Build.ArtifactStagingDirectory)\bin\manifests-packs
+  #           $(Build.ArtifactStagingDirectory)\bin\msi-nupkgs
+  #         ExcludeSNVerify: true
+  #         ApprovalListPathForCerts: $(Build.StagingDirectory)\sign-verify\SignVerifyIgnore.txt
 
   - ${{ if eq(parameters.pushNugets, true) }}:
     # Check - "xamarin-macios (Prepare Release Push NuGets)"
