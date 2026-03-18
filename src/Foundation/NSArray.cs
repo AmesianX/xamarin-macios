@@ -686,6 +686,18 @@ namespace Foundation {
 			return ArrayFromHandle<T> (handle, (h) => Runtime.GetINativeObject<T> (h, false)!, nsNullElementBehavior, releaseHandle)!;
 		}
 
+		/// <summary>Returns a strongly-typed C# array from a handle to an NSArray, dropping null elements.</summary>
+		/// <typeparam name="T">Parameter type, determines the kind of array returned.</typeparam>
+		/// <param name="handle">Pointer (handle) to the unmanaged object.</param>
+		/// <param name="createObject">A delegate to convert a native handle to an object of type T.</param>
+		/// <param name="nsNullElementBehavior">How to handle null and NSNull elements in the native array.</param>
+		/// <param name="releaseHandle">Whether the native NSArray instance should be released before returning or not.</param>
+		/// <returns>A C# array with the values (excluding null elements). Returns <see langword="null" /> if the handle is <see cref="NativeHandle.Zero" />.</returns>
+		internal static T []? ArrayFromHandleDropNullElements<T> (NativeHandle handle, Converter<NativeHandle, T> createObject, NSNullBehavior nsNullElementBehavior, bool releaseHandle = false)
+		{
+			return ArrayFromHandle<T> (handle, createObject, nsNullElementBehavior, releaseHandle)!;
+		}
+
 		/// <summary>Returns a strongly-typed C# array from a handle to an NSArray, dropping null elements and guaranteeing a non-null return value.</summary>
 		/// <typeparam name="T">Parameter type, determines the kind of array returned.</typeparam>
 		/// <param name="handle">Pointer (handle) to the unmanaged object.</param>
@@ -806,68 +818,64 @@ namespace Foundation {
 			GC.KeepAlive (weakArray);
 			return rv;
 		}
-#nullable disable
-		/// <typeparam name="T">Parameter type, determines the kind of
-		/// 	array returned, can be either an NSObject, or other
-		/// 	CoreGraphics data types.</typeparam>
-		///         <param name="weakArray">Handle to an weakly typed NSArray.</param>
-		///         <summary>Returns a strongly-typed C# array of the parametrized type from a weakly typed NSArray.</summary>
-		///         <returns>An C# array with the values.</returns>
-		///         <remarks>
-		///           <para>Use this method to get a set of NSObject arrays from an NSArray.</para>
-		///           <example>
-		///             <code lang="c#"><![CDATA[
+
+		/// <summary>Returns a strongly-typed C# array of the parametrized type from a weakly typed NSArray.</summary>
+		/// <typeparam name="T">Parameter type, determines the kind of array returned, can be either an <see cref="NSObject" />, or other CoreGraphics data types.</typeparam>
+		/// <param name="weakArray">Handle to a weakly typed NSArray.</param>
+		/// <returns>A C# array with the values.</returns>
+		/// <remarks>
+		///   <para>Use this method to get a set of NSObject arrays from an NSArray.</para>
+		///   <example>
+		///     <code lang="c#"><![CDATA[
 		/// NSArray someArray = ...;
 		///
-		/// CGImage [] myImages = NSArray.FromArray<CGImage> (someArray);
+		/// var myImages = NSArray.FromArrayNative<CGImage> (someArray);
 		/// ]]></code>
-		///           </example>
-		///         </remarks>
-		static public T [] FromArrayNative<T> (NSArray weakArray) where T : class, INativeObject
+		///   </example>
+		/// </remarks>
+		public static T []? FromArrayNative<T> (NSArray? weakArray) where T : class, INativeObject
 		{
-			if (weakArray is null || weakArray.Handle == NativeHandle.Zero)
-				return null;
 			try {
-				nuint n = weakArray.Count;
-				T [] ret = new T [n];
-				for (nuint i = 0; i < n; i++) {
-					ret [i] = Runtime.GetINativeObject<T> (weakArray.ValueAt (i), false);
-				}
-				return ret;
+				var rv = ArrayFromHandleDropNullElements<T> (weakArray.GetHandle (), NSNullBehavior.DropIfIncompatible);
+				GC.KeepAlive (weakArray);
+				return rv;
 			} catch {
 				return null;
 			}
 		}
 
-		// Used when we need to provide our constructor
-		/// <typeparam name="T">Parameter type, determines the kind of array returned.</typeparam>
-		/// <param name="handle">Pointer (handle) to the unmanaged object.</param>
-		/// <param name="createObject">To be added.</param>
-		/// <summary>Returns a strongly-typed C# array of the parametrized type from a handle to an NSArray.</summary>
-		/// <returns>An C# array with the values.</returns>
+		/// <summary>Creates a strongly-typed C# array from a handle to an <see cref="NSArray" />, using a custom factory function.</summary>
+		/// <typeparam name="T">The element type for the returned array.</typeparam>
+		/// <param name="handle">Pointer (handle) to the unmanaged <see cref="NSArray" /> object.</param>
+		/// <param name="createObject">A factory function that creates an instance of <typeparamref name="T" /> from a native handle.</param>
+		/// <returns>A C# array with the values, or <see langword="null" /> if <paramref name="handle" /> is <see cref="NativeHandle.Zero" />.</returns>
 		/// <remarks>
-		///           <para>Use this method to get a set of NSObject arrays from a handle to an NSArray.   Instead of wrapping the results in NSObjects, the code invokes your method to create the return value.</para>
-		///           <example>
-		///             <code lang="c#"><![CDATA[
-		/// int [] args = NSArray.ArrayFromHandle<int> (someHandle, (x) => (int) x);
+		///   <para>
+		///     Instead of wrapping the results in <see cref="NSObject" /> instances,
+		///     this method invokes <paramref name="createObject" /> for each element to create the return value.
+		///   </para>
+		///   <example>
+		///     <code lang="c#"><![CDATA[
+		/// var args = NSArray.ArrayFromHandleFunc<int> (someHandle, (x) => (int) x);
 		/// ]]></code>
-		///           </example>
-		///         </remarks>
-		static public T [] ArrayFromHandleFunc<T> (NativeHandle handle, Func<NativeHandle, T> createObject)
+		///   </example>
+		/// </remarks>
+		public static T? []? ArrayFromHandleFunc<T> (NativeHandle handle, Func<NativeHandle, T> createObject)
 		{
 			return ArrayFromHandle<T> (handle, (v) => createObject (v));
 		}
 
-		/// <summary>Create a managed array from a pointer to a native NSArray instance.</summary>
-		/// <param name="handle">The pointer to the native NSArray instance.</param>
-		/// <param name="createObject">A callback that returns an instance of the type T for a given pointer (for an element in the NSArray).</param>
-		/// <param name="releaseHandle">Whether the native NSArray instance should be released before returning or not.</param>
-		public static T [] ArrayFromHandleFunc<T> (NativeHandle handle, Func<NativeHandle, T> createObject, bool releaseHandle)
+		/// <summary>Creates a strongly-typed C# array from a handle to an <see cref="NSArray" />, using a custom factory function.</summary>
+		/// <typeparam name="T">The element type for the returned array.</typeparam>
+		/// <param name="handle">Pointer (handle) to the unmanaged <see cref="NSArray" /> object.</param>
+		/// <param name="createObject">A factory function that creates an instance of <typeparamref name="T" /> from a native handle.</param>
+		/// <param name="releaseHandle">Whether the native <see cref="NSArray" /> instance should be released before returning or not.</param>
+		/// <returns>A C# array with the values, or <see langword="null" /> if <paramref name="handle" /> is <see cref="NativeHandle.Zero" />.</returns>
+		public static T? []? ArrayFromHandleFunc<T> (NativeHandle handle, Func<NativeHandle, T> createObject, bool releaseHandle)
 		{
 			return ArrayFromHandle<T> (handle, (v) => createObject (v), releaseHandle);
 		}
 
-#nullable enable
 		/// <summary>Creates a managed array from a pointer to a native NSArray of NSDictionary objects, dropping null and NSNull elements.</summary>
 		/// <typeparam name="T">The type of objects to create from the dictionaries.</typeparam>
 		/// <param name="handle">The pointer to the native NSArray instance containing NSDictionary objects.</param>
