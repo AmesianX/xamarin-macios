@@ -22423,7 +22423,6 @@ P:Foundation.NSAppleScript.Source
 P:Foundation.NSArchiveReplaceEventArgs.NewObject
 P:Foundation.NSArchiveReplaceEventArgs.OldObject
 P:Foundation.NSArray.Count
-P:Foundation.NSArray`1.Item(System.IntPtr)
 P:Foundation.NSAttributedString.AttributedStringByInflectingString
 P:Foundation.NSAttributedString.Length
 P:Foundation.NSAttributedString.LowLevelValue
@@ -22898,7 +22897,6 @@ P:Foundation.NSMorphologyCustomPronoun.SubjectForm
 P:Foundation.NSMorphologyPronoun.DependentMorphology
 P:Foundation.NSMorphologyPronoun.Morphology
 P:Foundation.NSMorphologyPronoun.Pronoun
-P:Foundation.NSMutableArray`1.Item(System.UIntPtr)
 P:Foundation.NSMutableAttributedString.MutableString
 P:Foundation.NSMutableCharacterSet.Alphanumerics
 P:Foundation.NSMutableCharacterSet.Capitalized
@@ -25856,8 +25854,6 @@ P:PassKit.PKVehicleConnectionSession.Delegate
 P:PassKit.PKVehicleConnectionSession.WeakDelegate
 P:PdfKit.IPdfViewDelegate.ParentViewController
 P:PdfKit.PdfAnnotation.ActivatableTextField
-P:PdfKit.PdfAnnotationMarkup.QuadrilateralPoints
-P:PdfKit.PdfBorder.DashPattern
 P:PdfKit.PdfDocument.AccessPermissions
 P:PdfKit.PdfDocument.GetClassForAnnotationClass
 P:PdfKit.PdfDocumentWriteOptions.AccessPermissions
