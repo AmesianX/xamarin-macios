@@ -934,59 +934,81 @@ namespace Foundation {
 			return Runtime.GetINativeObject<T> (val, false);
 		}
 
-#nullable disable
-		// can return an INativeObject or an NSObject
-		/// <typeparam name="T">To be added.</typeparam>
-		/// <param name="index">To be added.</param>
-		/// <summary>To be added.</summary>
-		/// <returns>To be added.</returns>
-		/// <remarks>To be added.</remarks>
-		public T GetItem<T> (nuint index) where T : class, INativeObject
+		/// <summary>Returns the element at the specified index in the <see cref="NSArray" />, as a strongly-typed object.</summary>
+		/// <typeparam name="T">The type to return the element as. Must be a class that implements <see cref="INativeObject" />.</typeparam>
+		/// <param name="index">The zero-based index of the element to retrieve.</param>
+		/// <returns>The element at <paramref name="index" />, or <see langword="null" /> if the element cannot be converted to <typeparamref name="T" />.</returns>
+		/// <exception cref="ArgumentOutOfRangeException"><paramref name="index" /> is greater than or equal to the array's count.</exception>
+		public T? GetItem<T> (nuint index) where T : class, INativeObject
 		{
 			if (index >= GetCount (Handle))
-				throw new ArgumentOutOfRangeException ("index");
+				throw new ArgumentOutOfRangeException (nameof (index));
 
 			return UnsafeGetItem<T> (Handle, index);
 		}
 
-		/// <param name="weakArray">To be added.</param>
-		///         <summary>To be added.</summary>
-		///         <returns>To be added.</returns>
-		///         <remarks>To be added.</remarks>
-		public static NSObject [] [] FromArrayOfArray (NSArray weakArray)
+		/// <summary>Creates a jagged array of <see cref="NSObject" /> arrays from an <see cref="NSArray" /> of <see cref="NSArray" /> objects.</summary>
+		/// <param name="weakArray">An <see cref="NSArray" /> containing nested <see cref="NSArray" /> elements, or <see langword="null" />.</param>
+		/// <returns>A jagged array of <see cref="NSObject" /> arrays, or <see langword="null" /> if <paramref name="weakArray" /> is <see langword="null" /> or a conversion error occurs.</returns>
+		public static NSObject [] []? FromArrayOfArray (NSArray? weakArray)
 		{
-			if (weakArray is null || weakArray.Handle == IntPtr.Zero)
-				return null;
-
 			try {
-				nuint n = weakArray.Count;
-				var ret = new NSObject [n] [];
-				for (nuint i = 0; i < n; i++)
-					ret [i] = NSArray.FromArray<NSObject> (weakArray.GetItem<NSArray> (i));
-				return ret;
+				var rv = ArrayFromHandleDropNullElements<NSObject []> (
+					weakArray.GetHandle (),
+					(v) => NonNullArrayFromHandleDropNullElements<NSObject> (v),
+					NSNullBehavior.DropIfIncompatible);
+				GC.KeepAlive (weakArray);
+				return rv;
 			} catch {
 				return null;
 			}
 		}
 
-		/// <param name="items">To be added.</param>
-		///         <summary>To be added.</summary>
-		///         <returns>To be added.</returns>
-		///         <remarks>To be added.</remarks>
-		public static NSArray From (NSObject [] [] items)
+		/// <summary>Creates an <see cref="NSArray" /> from a jagged array of <see cref="NSObject" /> arrays.</summary>
+		/// <param name="items">A jagged array of <see cref="NSObject" /> arrays to convert, or <see langword="null" />.</param>
+		/// <returns>An <see cref="NSArray" /> containing nested <see cref="NSArray" /> elements, or <see langword="null" /> if <paramref name="items" /> is <see langword="null" /> or a conversion error occurs.</returns>
+		public static NSArray? From (NSObject [] []? items)
 		{
-			if (items is null)
-				return null;
-
 			try {
-				var ret = new NSMutableArray ((nuint) items.Length);
-				for (int i = 0; i < items.Length; i++)
-					ret.Add (NSArray.FromNSObjects (items [i]));
-				return ret;
+				return FromNSObjects ((item) => NSArray.FromNSObjects (item), items);
 			} catch {
 				return null;
 			}
 		}
+
+		/// <summary>Converts this <see cref="NSArray" /> to a strongly-typed C# array, dropping null and incompatible elements.</summary>
+		/// <typeparam name="T">The element type for the returned array. Must be a class that implements <see cref="INativeObject" />.</typeparam>
+		/// <returns>A C# array of <typeparamref name="T" /> elements, excluding any null or incompatible elements.</returns>
+		internal T []? ToArrayDropNullElements<T> () where T : class, INativeObject
+		{
+			var rv = ArrayFromHandleDropNullElements<T> (Handle);
+			GC.KeepAlive (this);
+			return rv;
+		}
+
+		/// <summary>Converts this <see cref="NSArray" /> to a strongly-typed C# array using a custom converter, dropping null elements.</summary>
+		/// <typeparam name="T">The element type for the returned array.</typeparam>
+		/// <param name="createObject">A delegate to convert a native handle to an instance of <typeparamref name="T" />.</param>
+		/// <returns>A C# array of <typeparamref name="T" /> elements, excluding any null elements.</returns>
+		internal T []? ToArrayDropNullElements<T> (Converter<NativeHandle, T> createObject)
+		{
+			var rv = ArrayFromHandleDropNullElements<T> (Handle, createObject);
+			GC.KeepAlive (this);
+			return rv;
+		}
+
+		/// <summary>Converts this <see cref="NSArray" /> to a C# array by first resolving each element to <typeparamref name="V" />, then converting to <typeparamref name="T" />, dropping null elements.</summary>
+		/// <typeparam name="T">The target element type for the returned array.</typeparam>
+		/// <typeparam name="V">The intermediate native object type used to convert each element. Must be a class that implements <see cref="INativeObject" />.</typeparam>
+		/// <param name="createObject">A delegate to convert an instance of <typeparamref name="V" /> to <typeparamref name="T" />.</param>
+		/// <returns>A C# array of <typeparamref name="T" /> elements, excluding any null elements.</returns>
+		internal T []? ToArrayDropNullElements<T, V> (Converter<V, T> createObject) where V : class, INativeObject
+		{
+			var rv = ArrayFromHandleDropNullElements<T> (Handle, (handle) => createObject (Runtime.GetINativeObject<V> (handle, false)!));
+			GC.KeepAlive (this);
+			return rv;
+		}
+#nullable disable
 
 		public TKey [] ToArray<TKey> () where TKey : class, INativeObject
 		{
