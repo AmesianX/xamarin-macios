@@ -5740,16 +5740,6 @@ F:NetworkExtension.NENetworkRuleProtocol.Udp
 F:NetworkExtension.NEProviderStopReason.AppUpdate
 F:NetworkExtension.NEProviderStopReason.InternalError
 F:NetworkExtension.NEProviderStopReason.Sleep
-F:NetworkExtension.NERelayManagerClientError.CertificateExpired
-F:NetworkExtension.NERelayManagerClientError.CertificateInvalid
-F:NetworkExtension.NERelayManagerClientError.CertificateMissing
-F:NetworkExtension.NERelayManagerClientError.DNSFailed
-F:NetworkExtension.NERelayManagerClientError.None
-F:NetworkExtension.NERelayManagerClientError.Other
-F:NetworkExtension.NERelayManagerClientError.ServerCertificateExpired
-F:NetworkExtension.NERelayManagerClientError.ServerCertificateInvalid
-F:NetworkExtension.NERelayManagerClientError.ServerDisconnected
-F:NetworkExtension.NERelayManagerClientError.ServerUnreachable
 F:NetworkExtension.NERelayManagerError.CannotBeRemoved
 F:NetworkExtension.NERelayManagerError.Disabled
 F:NetworkExtension.NERelayManagerError.Invalid
@@ -30814,7 +30804,6 @@ T:NetworkExtension.NENetworkRuleProtocol
 T:NetworkExtension.NEPrivateLteNetwork
 T:NetworkExtension.NERelay
 T:NetworkExtension.NERelayManager
-T:NetworkExtension.NERelayManagerClientError
 T:NetworkExtension.NERelayManagerError
 T:NetworkExtension.NERelayManagerGetLastClientErrorsCallback
 T:NetworkExtension.NETrafficDirection
