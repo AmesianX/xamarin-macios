@@ -11910,12 +11910,9 @@ M:Foundation.NSArray.RemoveObserver(Foundation.NSObject,Foundation.NSIndexSet,Sy
 M:Foundation.NSArray.RemoveObserver(Foundation.NSObject,Foundation.NSIndexSet,System.String)
 M:Foundation.NSArray.SetValueForKey(Foundation.NSObject,Foundation.NSString)
 M:Foundation.NSArray.Sort(Foundation.NSComparator)
-M:Foundation.NSArray.ToArray
-M:Foundation.NSArray.ToArray``1
 M:Foundation.NSArray.ValueForKey(Foundation.NSString)
 M:Foundation.NSArray.Write(Foundation.NSUrl,Foundation.NSError@)
 M:Foundation.NSArray.WriteToFile(System.String,System.Boolean)
-M:Foundation.NSArray`1.ToArray
 M:Foundation.NSAttributedString.#ctor(Foundation.NSAttributedString)
 M:Foundation.NSAttributedString.#ctor(System.String,AppKit.NSFont,AppKit.NSColor,AppKit.NSColor,AppKit.NSColor,AppKit.NSColor,AppKit.NSColor,Foundation.NSUnderlineStyle,Foundation.NSUnderlineStyle,AppKit.NSParagraphStyle,System.Single,AppKit.NSShadow,Foundation.NSUrl,System.Boolean,AppKit.NSTextAttachment,Foundation.NSLigatureType,System.Single,System.Single,System.Single,System.Single,AppKit.NSCursor,System.String,System.Int32,AppKit.NSGlyphInfo,Foundation.NSArray,System.Boolean,AppKit.NSTextLayoutOrientation,AppKit.NSTextAlternatives,AppKit.NSSpellingState)
 M:Foundation.NSAttributedString.#ctor(System.String)
